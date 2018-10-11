@@ -20,15 +20,6 @@ int wmain(int argc, WCHAR* argv[])
 			{
 				delete rsp;
 				
-				while (true)
-				{
-					int c = _getch();
-					if (c == ' ')
-					{
-						break;
-					}
-				}
-
 				rsp = new RealSenseProcessor();
 			}
 		}

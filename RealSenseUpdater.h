@@ -59,8 +59,7 @@
 #define DIFF_EXCLUDE_THRESHOLD 20
 #define GAUSS_EXCLUDE_THRESHOLD 10
 #define CONTOUR_SIZE_THRESHOLD 10
-#define __DEBUG_MODE__
-//#define __ENABLE_HAND_TRACKING__
+//#define __DEBUG_MODE__
 
 using namespace Intel::RealSense;
 
@@ -83,7 +82,6 @@ public:
 	bool saveData(std::string directory, std::string name);
 	void setEnableHandTracking(bool _enableHandTracking);
 	void changeThreshold(bool isIncr);
-	void showFPS(std::chrono::system_clock::time_point time1, std::chrono::system_clock::time_point time2);
 	void showFPS();
 
 	enum
@@ -101,20 +99,13 @@ private:
 
 	Status ppInit(int num);
 	void showStatus(Status sts);
-	void initializeViewer(const std::string &id, pcl::PointCloud<pcl::PointXYZRGB>::Ptr &pointCloudPtr, double pointSize = 1.0);
-	bool updateCameraImage(PXCImage* cameraFrame, bool isDepthImage);
 	void realsenseHandStatus(PXCHandData *handAnalyzer);
-	bool updateHandImage(void);
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr updatePointCloud(bool isHandDataArrived);
-	void releaseHandImage(void);
-	//void updateViewerText(void);
-	//void keyboardCallback(const pcl::visualization::KeyboardEvent& event, void*);
 	bool acqireImage(PXCImage* cameraFrame, cv::Mat &mat, PXCImage::PixelFormat pixelFormat);
 	int countMat(cv::Mat mat, cv::Vec4b elm);
 	int countMat(cv::Mat mat, unsigned char elm);
 	int countMat(cv::Mat mat, float elm);
-	//bool keyboardCallBackSettings(int key);
-	bool isOutliers(float rawDepthElem, float rawDepthPrevElem);
+		bool isOutliers(float rawDepthElem, float rawDepthPrevElem);
 	int detC(cv::Mat src);
 	void calcDepthMark();
 	void setTipCloud();
@@ -126,7 +117,6 @@ private:
 	int cameraNum;
 	double nearThreshold = 0.15;
 	double farThreshold = 0.6;
-	//bool enableHandTracking = false;
 
 	SenseManager *pp;
 
@@ -165,16 +155,6 @@ private:
 	//cv::Mat depthImage;
 	cv::Mat rawDepthImage;
 	cv::Mat rawDepthImagePrev;
-#ifdef __ENABLE_HAND_TRACKING__
-	cv::Mat handImage1;
-	cv::Mat handImage2;
-	cv::Mat handImage;
-	cv::Mat grayHandImage;
-	cv::Mat handPoint;
-#endif
-	/*cv::Mat rawDepthDiffImage;
-	cv::Mat rawDepthDiffImageFilterd;
-	cv::Mat rawDepthImageGauss;*/
 	cv::Mat depthmarked;
 	cv::Mat colorMappedToDepth;
 
@@ -253,13 +233,10 @@ private:
 
 	// depth32f画像をファイルに書き込む
 	void writeDepth(const std::string name);
-	//std::string makeNameFolder(int hrgn);
-	//std::string makeNameFail(int hrgn, int num);
 	//cv::Mat drawGuide(const cv::Mat& input, int num);
 	//void printText(int hrgn, int num);
 	//void shorGuideImage(const cv::Mat depth, int num);
 	cv::Mat RealSenseUpdater::readDepth(const std::string name);
-	//std::string getTime(void);
 
 	const int numMax = 9; // 保存する一文字の数
 	const int distMin = 375; // 手前の距離
@@ -276,7 +253,7 @@ private:
 	int const max_elem = 2;
 
 	//int cloudAlphaCh = 0;
-	
+
 	PointCloud2Mesh::gpParameters param;
 
 	double fps = 0;

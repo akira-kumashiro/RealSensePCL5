@@ -37,10 +37,6 @@ RealSenseProcessor::RealSenseProcessor() :
 
 RealSenseProcessor::~RealSenseProcessor()
 {
-	/*for (int i = 0; i < NUM; i++)
-	{
-
-	}*/
 
 	viewer->close();
 
@@ -90,9 +86,6 @@ bool RealSenseProcessor::run(void)
 			//printf_s("\n%d\n",rsu[i].run());
 			if (NUM > 1)
 				rsu[i].setLaserPower(0);
-
-			//if (i != 0)
-				//transformMat[i] = transformMat[i] * regist[i].getTransformMatrix(rsu[0].camera_point_cloud_ptr, rsu[i].camera_point_cloud_ptr);
 
 			viewer->updatePointCloud(regist_tip[i].transformPointcloud(rsu[i].camera_point_cloud_ptr), cloud_id[i]);
 			viewer->updatePointCloud(regist_tip[i].transformPointcloud(rsu[i].tip_point_cloud_ptr), tip_cloud_id[i]);
@@ -213,8 +206,6 @@ bool RealSenseProcessor::keyboardCallBackSettings(int key)
 
 void RealSenseProcessor::initializeViewer(const std::string & id, pcl::PointCloud<pcl::PointXYZRGB>::Ptr & pointCloudPtr, double pointSize)
 {
-	//pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGBA> hand_rgb(pointCloudPtr);
-	//viewer->addPointCloud<pcl::PointXYZRGBA>(pointCloudPtr, hand_rgb, id);
 	viewer->addPointCloud(pointCloudPtr, id);
 	viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, pointSize, id);
 }

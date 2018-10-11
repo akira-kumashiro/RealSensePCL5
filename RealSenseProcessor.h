@@ -36,28 +36,6 @@
 #include "RealSenseUpdater.h"
 #include "PCL_Regist.h"
 
-/*#ifdef _DEBUG
-//Debugモードの場合
-#pragma comment(lib,"C:\\opencv\\opencv-2.4.11\\build\\x64\\vc12\\lib\\opencv_core2411d.lib")
-#pragma comment(lib,"C:\\opencv\\opencv-2.4.11\\build\\x64\\vc12\\lib\\opencv_imgproc2411d.lib")
-#pragma comment(lib,"C:\\opencv\\opencv-2.4.11\\build\\x64\\vc12\\lib\\opencv_highgui2411d.lib")
-#else
-//Releaseモードの場合
-#pragma comment(lib,"C:\\opencv\\opencv-2.4.11\\build\\x64\\vc12\\lib\\opencv_core2411.lib")
-#pragma comment(lib,"C:\\opencv\\opencv-2.4.11\\build\\x64\\vc12\\lib\\opencv_imgproc2411.lib")
-#pragma comment(lib,"C:\\opencv\\opencv-2.4.11\\build\\x64\\vc12\\lib\\opencv_highgui2411.lib")
-#endif*/
-
-/*#define _USE_MATH_DEFINES
-#include <math.h>
-
-#define SHOW_DEPTH_ROW 7
-#define AVERAGE_FRAME_NUM 10
-#define CLOUD_SCALE 1000
-#define CLOUD_PITCH 1
-#define DIFF_EXCLUDE_THRESHOLD 20
-#define GAUSS_EXCLUDE_THRESHOLD 10
-#define CONTOUR_SIZE_THRESHOLD 10*/
 #define NUM 2
 #define POWER 3
 #define TIME_STANDBY 100
