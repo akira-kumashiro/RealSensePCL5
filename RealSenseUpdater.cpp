@@ -420,7 +420,7 @@ void RealSenseUpdater::setTipCloud()
 	HandDetect det(nearThreshold * CLOUD_SCALE, farThreshold * CLOUD_SCALE);
 
 	std::vector<cv::Point> tipPos = det.getTipData(rawDepthImage.clone(), colorMappedToDepth.clone());
-
+	colorMappedToDepth = det.colorMarked.clone();
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr tip_cloud_temp(new pcl::PointCloud<pcl::PointXYZRGB>);
 	//cv::imshow("colorMapped(" + std::to_string(cameraNum) + ")", det.colorMarked);
 	if (tipPos[0] == cv::Point(-1, -1))

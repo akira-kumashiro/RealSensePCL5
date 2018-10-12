@@ -168,9 +168,9 @@ bool RealSenseProcessor::keyboardCallBackSettings(int key)
 			}
 			else
 			{
-				if (rsu[0].tip_point_cloud_ptr->size() >= 5)
+				if (rsu[0].tip_point_cloud_ptr->size() < 5)
 					wColorIO(wColorIO::PRINT_ERROR, L"The number of points #0 is too small!\n");
-				if (rsu[i].tip_point_cloud_ptr->size() >= 5)
+				if (rsu[i].tip_point_cloud_ptr->size() < 5)
 					wColorIO(wColorIO::PRINT_ERROR, L"The number of points #%d is too small!\n", i);
 			}
 		}
