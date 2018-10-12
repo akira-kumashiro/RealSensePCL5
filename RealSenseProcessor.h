@@ -36,9 +36,9 @@
 #include "RealSenseUpdater.h"
 #include "PCL_Regist.h"
 
-#define NUM 2
+#define NUM 3
 #define POWER 3
-#define TIME_STANDBY 100
+#define TIME_STANDBY 50
 
 
 using namespace Intel::RealSense;

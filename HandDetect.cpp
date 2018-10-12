@@ -18,8 +18,26 @@ std::vector<cv::Point> HandDetect::getTipData(cv::Mat depth, cv::Mat color)
 	depthImage = depth;
 	colorImage = color;
 
-
 	depthBinaryImage = getBinaryImage();
+
+	for (int y = 0; y < colorImage.rows; y++)
+	{
+		uchar* depthBinaryImagePtr = depthBinaryImage.ptr<uchar>(y);
+		cv::Vec3b* colorImagePtr = colorImage.ptr<cv::Vec3b>(y);
+		for (int x = 0; x < colorImage.cols; x++)
+		{
+			if (depthBinaryImagePtr[x] == 0)
+			{
+				int p = (x / 10 + y / 10) % 2;
+				cv::Vec3b c = cv::Vec3b(p, p, p) * 204+cv::Vec3b(51,51,51);
+				colorImagePtr[x] = colorImagePtr[x]*0.8 + c*0.2;
+			}
+			else if (colorImagePtr[x] == cv::Vec3b(0, 0, 0))
+			{
+				colorImagePtr[x] = cv::Vec3b(128, 128, 128);
+			}
+		}
+	}
 
 	//cv::imshow("binary", depthBinaryImage);
 
@@ -39,7 +57,7 @@ std::vector<cv::Point> HandDetect::getTipData(cv::Mat depth, cv::Mat color)
 			{
 				src->imageData[src->widthStep * y + x * 3 + i] = colorPtr[x][i];
 			}
-			gray->imageData[gray->widthStep*y + x] = depthPtr[x];
+			gray->imageData[gray->widthStep * y + x] = depthPtr[x];
 		}
 	}
 
@@ -123,7 +141,7 @@ std::vector<cv::Point> HandDetect::getTipData(cv::Mat depth, cv::Mat color)
 						tipPositions.push_back(cv::Point((*(defectArray[i].start)).x, (*(defectArray[i].start)).y));
 
 						tipPositions.push_back(cv::Point((*(defectArray[i].depth_point)).x, (*(defectArray[i].depth_point)).y));
-						if (i > 0 && (*(defectArray[i - 1].start)).x != (*(defectArray[i].end)).x&& (*(defectArray[i - 1].start)).y != (*(defectArray[i].end)).y)
+						if (i > 0 && (*(defectArray[i - 1].start)).x != (*(defectArray[i].end)).x && (*(defectArray[i - 1].start)).y != (*(defectArray[i].end)).y)
 						{
 							tipPositions.push_back(cv::Point((*(defectArray[i].end)).x, (*(defectArray[i].end)).y));
 						}
@@ -139,10 +157,10 @@ std::vector<cv::Point> HandDetect::getTipData(cv::Mat depth, cv::Mat color)
 		}
 	}
 
-	for (auto i = 0; i < tipPositions.size(); i++)
+	/*for (auto i = 0; i < tipPositions.size(); i++)
 	{
-		printf("tipPositions[%d]=(%d,%d)\n", i, tipPositions[i].x, tipPositions[i].y);
-	}
+		printf("tipPositions[%2d]=(%3d,%3d)\n", i, tipPositions[i].x, tipPositions[i].y);
+	}*/
 
 
 	cvReleaseMemStorage(&storage);

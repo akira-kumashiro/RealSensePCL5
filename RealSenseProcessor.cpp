@@ -53,7 +53,7 @@ bool RealSenseProcessor::run(void)
 		/*wColorIO(wColorIO::PRINT_INFO, L"RSP>");
 		wColorIO(wColorIO::PRINT_SUCCESS, L"Prosessing #%d device.\n",i);*/
 
-		rsu[i].setEnableHandTracking(false);
+		//rsu[i].setEnableHandTracking(false);
 
 		if (rsu[i].init(i) < RealSenseUpdater::RSU_NO_ERROR)
 		{
@@ -75,18 +75,20 @@ bool RealSenseProcessor::run(void)
 			int callback = rsu[i].run();
 			if (callback < RealSenseUpdater::RSU_NO_ERROR)
 			{
+				wprintf_s(L"%d\n", callback);
 				return setReInit();
 			}
 			else if (callback != RealSenseUpdater::RSU_NO_ERROR)
 			{
 				keyboardCallBackSettings(callback);
 			}
-			rsu[i].showFPS();
+			//rsu[i].showFPS();
 
 			//printf_s("\n%d\n",rsu[i].run());
 			if (NUM > 1)
 				rsu[i].setLaserPower(0);
 
+			updateViewerText();
 			viewer->updatePointCloud(regist_tip[i].transformPointcloud(rsu[i].camera_point_cloud_ptr), cloud_id[i]);
 			viewer->updatePointCloud(regist_tip[i].transformPointcloud(rsu[i].tip_point_cloud_ptr), tip_cloud_id[i]);
 			viewer->spinOnce();
@@ -231,12 +233,31 @@ bool RealSenseProcessor::setReInit(void)
 
 void RealSenseProcessor::updateViewerText(void)
 {
+	//const char* TF[] = { "off", "median", "average" };
+	//const char* elemStr[] = { "Rect","Cross","Ellipse" };
+	//char morph_str;
 	std::vector<boost::format> entries;
+	for (int i = NUM - 1; i >= 0; i--)
+	{
+		entries.push_back(boost::format("Cam #%i FPS:%i Num of tip:%i") % i % rsu[i].fps % (int)(rsu[i].tip_point_cloud_ptr->size()));
+	}
+
+
+	/*entries.push_back(boost::format("Hand Point Cloud Num = %i") % pointCloudNum[CLOUD_HAND]);
+	entries.push_back(boost::format("Camera Point Cloud Num = %i") % pointCloudNum[CLOUD_CAMERA]);
+	entries.push_back(boost::format("Joint Point Cloud Num = %i") % pointCloudNum[CLOUD_JOINT]);
+	entries.push_back(boost::format("morph_size = %i") % morph_size);
+	entries.push_back(boost::format("morph_elem = %s") % elemStr[morph_elem]);
+	entries.push_back(boost::format("sigmaG = %.1f") % sigmaG);
+	entries.push_back(boost::format("gSize = %i") % gSize);*/
+	//"Element:\n 0: Rect - 1: Cross - 2: Ellipse"
 
 	const int dx = 5;
 	const int dy = 14;
 	const int fs = 10;
 	boost::format name_fmt("text%i");
+
+	//std::vector<boost::format> entries = app.viewerTextUpdate();
 
 	for (size_t i = 0; i < entries.size(); ++i)
 	{

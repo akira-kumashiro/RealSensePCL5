@@ -65,7 +65,6 @@ using namespace Intel::RealSense;
 
 class RealSenseUpdater
 {
-	//private:
 public:
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr hand_point_cloud_ptr;
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr camera_point_cloud_ptr;
@@ -90,27 +89,30 @@ public:
 		RSU_DEVICE_REMOVED = -2,
 		RSU_ERROR_OCCURED = -1,
 		RSU_COLOR_IMAGE_UNAVAILABLE = -3,
-		RSU_DEPTH_IMAGE_UNAVAILABLE = -4,
-		RSU_USER_INTERRUPTED = -5
+		RSU_DEPTH_IMAGE_UNAVAILABLE = -11,
+		RSU_USER_INTERRUPTED = -12,
+		RSU_MAPPING_UNAVAILABLE = 1
 	};
 
+	double fps = 0;
+	Status sts;
 private:
 	boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer;
 
-	Status ppInit(int num);
+	void ppInit(int num);
 	void showStatus(Status sts);
-	void realsenseHandStatus(PXCHandData *handAnalyzer);
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr updatePointCloud(bool isHandDataArrived);
 	bool acqireImage(PXCImage* cameraFrame, cv::Mat &mat, PXCImage::PixelFormat pixelFormat);
 	int countMat(cv::Mat mat, cv::Vec4b elm);
 	int countMat(cv::Mat mat, unsigned char elm);
 	int countMat(cv::Mat mat, float elm);
-		bool isOutliers(float rawDepthElem, float rawDepthPrevElem);
-	int detC(cv::Mat src);
+	//bool isOutliers(float rawDepthElem, float rawDepthPrevElem);
+	//int detC(cv::Mat src);
 	void calcDepthMark();
 	void setTipCloud();
+	cv::Mat drawMappedImage(void);
 
-	Status sts;
+
 	bool isContinue;
 	bool isUserInterrupt;
 	bool isExit = false;
@@ -137,10 +139,6 @@ private:
 		CV_WAITKEY_CURSORKEY_LEFT = 2424832,
 	};
 
-
-
-	//bool isCloudArrived[CLOUD_NUM];
-
 	static const int COLOR_WIDTH = 1920;
 	static const int COLOR_HEIGHT = 1080;
 	static const int COLOR_FPS = 30;
@@ -158,38 +156,12 @@ private:
 	cv::Mat depthmarked;
 	cv::Mat colorMappedToDepth;
 
-	pxcI32 numberOfHands;
-
-	//std::vector<unsigned short> depthBuffer;
-	//const std::string windowName[1] = { "handimage" };
-
-	/*const int COLOR_WIDTH = 640;
-	const int COLOR_HEIGHT = 480;
-	const int COLOR_FPS = 30;
-
-	const int DEPTH_WIDTH = 640;
-	const int DEPTH_HEIGHT = 480;
-	const int DEPTH_FPS = 30;*/
-
 	//ÉNÉâÉXì‡ïœêî
-	/*int colorImageNum = 0;
-	int depthImageNum = 0;
-	int imageNum = 0;
-	int dataNum = 0;*/
-	//float bilateralS = 5;
-	//float bilateralR = 0.05;
-	//bool enableBilateral = false;
-
 	wchar_t directoryName[20];
 	char nallowDirectoryName[20];
 	std::string dataFileName;
 	std::ofstream dataFile;
 	char windowTitle[20];
-
-	//double sigmaG = 1.0;
-	//int gSize = 1;
-
-	//int pointCloudNum[CLOUD_NUM];
 
 	PXCHandConfiguration* config = NULL;
 	PXCHandData* handData = NULL;
@@ -256,7 +228,6 @@ private:
 
 	PointCloud2Mesh::gpParameters param;
 
-	double fps = 0;
 
 	std::chrono::system_clock::time_point nowTime, prevTime;
 };
