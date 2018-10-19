@@ -103,15 +103,15 @@ private:
 	void showStatus(Status sts);
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr updatePointCloud(bool isHandDataArrived);
 	bool acqireImage(PXCImage* cameraFrame, cv::Mat &mat, PXCImage::PixelFormat pixelFormat);
-	int countMat(cv::Mat mat, cv::Vec4b elm);
+	/*int countMat(cv::Mat mat, cv::Vec4b elm);
 	int countMat(cv::Mat mat, unsigned char elm);
-	int countMat(cv::Mat mat, float elm);
+	int countMat(cv::Mat mat, float elm);*/
 	//bool isOutliers(float rawDepthElem, float rawDepthPrevElem);
 	//int detC(cv::Mat src);
 	void calcDepthMark();
 	void setTipCloud();
 	cv::Mat drawMappedImage(void);
-
+	void debugPrint(int line);
 
 	bool isContinue;
 	bool isUserInterrupt;
@@ -122,29 +122,43 @@ private:
 
 	SenseManager *pp;
 
-	enum
+	/*enum
 	{
 		CLOUD_HAND,
 		CLOUD_CAMERA,
 		CLOUD_JOINT,
 		CLOUD_NEAR,
 		CLOUD_NUM,
-	};
+	};*/
 
-	enum
+	/*enum
 	{
 		CV_WAITKEY_CURSORKEY_TOP = 2490368,
 		CV_WAITKEY_CURSORKEY_BOTTOM = 2621440,
 		CV_WAITKEY_CURSORKEY_RIGHT = 2555904,
 		CV_WAITKEY_CURSORKEY_LEFT = 2424832,
+	};*/
+
+	std::vector<cv::Size> colorSizes = {
+		cv::Size(320,180),//0
+		cv::Size(320,240),//1
+		cv::Size(424,240),//2
+		cv::Size(640,360),//3
+		cv::Size(848,480),//4
+		cv::Size(960,540),//5
+		cv::Size(1280,720),//6
+		cv::Size(1920,1080)//7//Å©èdÇ∑Ç¨ÇƒcolorÇæÇØÇ∆ÇÍÇ»Ç≠Ç»Ç¡ÇΩÇËÇ∑ÇÈ
 	};
 
-	static const int COLOR_WIDTH = 1920;
-	static const int COLOR_HEIGHT = 1080;
+	std::vector<cv::Size> depthSizes = {
+		cv::Size(640,240),//0
+		cv::Size(640,480)//1
+	};
+
+	cv::Size colorSize;
 	static const int COLOR_FPS = 30;
 
-	static const int DEPTH_WIDTH = 640;
-	static const int DEPTH_HEIGHT = 480;
+	cv::Size depthSize;
 	static const int DEPTH_FPS = 30;
 
 
@@ -224,11 +238,8 @@ private:
 	int morph_size = 1;
 	int const max_elem = 2;
 
-	//int cloudAlphaCh = 0;
-
 	PointCloud2Mesh::gpParameters param;
-
-
+	
 	std::chrono::system_clock::time_point nowTime, prevTime;
 };
 

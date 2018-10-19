@@ -22,7 +22,7 @@ class HandDetect
 public:
 	HandDetect(double nearThreshold, double farThreshold);
 	std::vector<cv::Point> getTipData(cv::Mat depth, cv::Mat color);
-	cv::Mat colorMarked;
+	cv::Mat colorMarked,contourMask;
 	~HandDetect();
 private:
 	cv::Mat colorImage, depthImage, depthBinaryImage;

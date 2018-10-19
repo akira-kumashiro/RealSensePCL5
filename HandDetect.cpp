@@ -15,6 +15,8 @@ std::vector<cv::Point> HandDetect::getTipData(cv::Mat depth, cv::Mat color)
 	CvSize sz = cvSize(color.cols, color.rows);
 
 	depthBinaryImage = cv::Mat::zeros(cv::Size(depth.cols, depth.rows), CV_8U);
+	contourMask = cv::Mat::zeros(cv::Size(depth.cols, depth.rows), CV_8U);
+	colorMarked = cv::Mat::zeros(cv::Size(depth.cols, depth.rows), CV_8UC3);
 	depthImage = depth;
 	colorImage = color;
 
@@ -29,8 +31,8 @@ std::vector<cv::Point> HandDetect::getTipData(cv::Mat depth, cv::Mat color)
 			if (depthBinaryImagePtr[x] == 0)
 			{
 				int p = (x / 10 + y / 10) % 2;
-				cv::Vec3b c = cv::Vec3b(p, p, p) * 204+cv::Vec3b(51,51,51);
-				colorImagePtr[x] = colorImagePtr[x]*0.8 + c*0.2;
+				cv::Vec3b c = cv::Vec3b(p, p, p) * 204 + cv::Vec3b(51, 51, 51);
+				colorImagePtr[x] = colorImagePtr[x] * 0.8 + c * 0.2;
 			}
 			else if (colorImagePtr[x] == cv::Vec3b(0, 0, 0))
 			{
@@ -45,6 +47,8 @@ std::vector<cv::Point> HandDetect::getTipData(cv::Mat depth, cv::Mat color)
 	IplImage* src = cvCreateImage(sz, IPL_DEPTH_8U, 3);
 	//IplImage* gray = cvCreateImage(cvSize(270, 270), 8, 1);
 	IplImage* gray = cvCreateImage(sz, IPL_DEPTH_8U, 1);
+	IplImage* cMask = cvCreateImage(sz, IPL_DEPTH_8U, 3);
+	//IplImage* cMaskTemp = cvCreateImage(sz, IPL_DEPTH_8U, 1);
 
 	//*src = image;//このコードだったらメモリが増えるから下のコードで
 	for (int y = 0; y < color.rows; y++)
@@ -68,9 +72,9 @@ std::vector<cv::Point> HandDetect::getTipData(cv::Mat depth, cv::Mat color)
 	double area, max_area = 0.0;
 	CvSeq* ptr = 0;
 	//int maxn=0,n=0;
-
 	if (cn > 0)
 	{
+		//printf_s("print\n");
 		for (ptr = first_contour; ptr != NULL; ptr = ptr->h_next)
 		{
 			area = fabs(cvContourArea(ptr, CV_WHOLE_SEQ, 0));
@@ -147,6 +151,7 @@ std::vector<cv::Point> HandDetect::getTipData(cv::Mat depth, cv::Mat color)
 						}
 					}
 				}
+				cvDrawContours(cMask, maxitem, CV_RGB(255, 255, 255), CV_RGB(255, 255, 255), 0, CV_FILLED, 8);
 
 				//cvNamedWindow("contour", 1); cvShowImage("contour", src);
 
@@ -156,23 +161,42 @@ std::vector<cv::Point> HandDetect::getTipData(cv::Mat depth, cv::Mat color)
 			cvReleaseMemStorage(&storage2);
 		}
 	}
-
+	if (tipPositions.empty())
+	{
+		tipPositions.push_back(cv::Point(-1, -1));
+	}
 	/*for (auto i = 0; i < tipPositions.size(); i++)
 	{
 		printf("tipPositions[%2d]=(%3d,%3d)\n", i, tipPositions[i].x, tipPositions[i].y);
 	}*/
 
+	//cvCvtColor(cMask, cMaskTemp, CV_BGR2GRAY);
+	//cvThreshold(cMaskTemp, cMaskTemp, 0, 255, (CV_THRESH_BINARY_INV + CV_THRESH_OTSU));
 
 	cvReleaseMemStorage(&storage);
 	//cvNamedWindow("threshold", 1); cvShowImage("threshold", src);
-	colorMarked = src;
-	//printf_s("print\n");
+	//colorMarked = src;
+	//contourMask = cMaskTemp;
+
+	for (int y = 0; y < colorMarked.rows; y++)
+	{
+		cv::Vec3b* colorMarkedPtr = colorMarked.ptr<cv::Vec3b>(y);
+		uchar* contourMaskPtr = contourMask.ptr<uchar>(y);
+		for (int x = 0; x < colorMarked.cols; x++)
+		{
+			for (int i = 0; i < 3; i++)
+			{
+				colorMarkedPtr[x][i] = src->imageData[src->widthStep * y + x * 3 + i];
+			}
+			contourMaskPtr[x] = cMask->imageData[cMask->widthStep*y + x * 3];
+		}
+	}
+
 	cvReleaseImage(&src);
 	cvReleaseImage(&gray);
-	if (tipPositions.empty())
-	{
-		tipPositions.push_back(cv::Point(-1, -1));
-	}
+	cvReleaseImage(&cMask);
+	//cvReleaseImage(&cMaskTemp);
+
 	return tipPositions;
 }
 

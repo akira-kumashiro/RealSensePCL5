@@ -27,7 +27,7 @@ RealSenseProcessor::RealSenseProcessor() :
 	{
 		cloud_id.push_back("cloud(" + std::to_string(i) + ")");
 		tip_cloud_id.push_back("tip_cloud(" + std::to_string(i) + ")");
-		initializeViewer(cloud_id[i], rsu[i].camera_point_cloud_ptr, 1.0);
+		initializeViewer(cloud_id[i], rsu[i].hand_point_cloud_ptr, 1.0);
 		initializeViewer(tip_cloud_id[i], rsu[i].tip_point_cloud_ptr, 20.0);
 	}
 	viewer->addCoordinateSystem(0.01);
@@ -68,8 +68,8 @@ bool RealSenseProcessor::run(void)
 	{
 		for (int i = 0; i < NUM; i++)
 		{
-			/*wColorIO(wColorIO::PRINT_INFO, L"RSP>");
-			wColorIO(wColorIO::PRINT_SUCCESS, L"Prosessing #%d device.\n", i);*/
+			//wColorIO(wColorIO::PRINT_INFO, L"RSP>");
+			//wColorIO(wColorIO::PRINT_SUCCESS, L"Prosessing #%d device.\n", i);
 			rsu[i].setLaserPower(POWER);
 			keyboardCallBackSettings(cv::waitKey(TIME_STANDBY / 2));
 			int callback = rsu[i].run();
@@ -89,7 +89,7 @@ bool RealSenseProcessor::run(void)
 				rsu[i].setLaserPower(0);
 
 			updateViewerText();
-			viewer->updatePointCloud(regist_tip[i].transformPointcloud(rsu[i].camera_point_cloud_ptr), cloud_id[i]);
+			viewer->updatePointCloud(regist_tip[i].transformPointcloud(rsu[i].hand_point_cloud_ptr), cloud_id[i]);
 			viewer->updatePointCloud(regist_tip[i].transformPointcloud(rsu[i].tip_point_cloud_ptr), tip_cloud_id[i]);
 			viewer->spinOnce();
 			keyboardCallBackSettings(cv::waitKey(TIME_STANDBY / 2));
@@ -164,7 +164,7 @@ bool RealSenseProcessor::keyboardCallBackSettings(int key)
 			if (rsu[0].tip_point_cloud_ptr->size() >= 5 && rsu[i].tip_point_cloud_ptr->size() >= 5)
 			{
 				transformMat[i] = transformMat[i] * regist_tip[i].getTransformMatrix(rsu[0].tip_point_cloud_ptr, rsu[i].tip_point_cloud_ptr, Eigen::Matrix4f::Identity());//, transformMat[i]
-				transformMat[i] = transformMat[i] * regist_near[i].getTransformMatrix(rsu[0].near_point_cloud_ptr, rsu[i].near_point_cloud_ptr, transformMat[i]);
+				transformMat[i] = transformMat[i] * regist_near[i].getTransformMatrix(rsu[0].hand_point_cloud_ptr, rsu[i].hand_point_cloud_ptr, transformMat[i]);
 			}
 			else
 			{
@@ -233,24 +233,11 @@ bool RealSenseProcessor::setReInit(void)
 
 void RealSenseProcessor::updateViewerText(void)
 {
-	//const char* TF[] = { "off", "median", "average" };
-	//const char* elemStr[] = { "Rect","Cross","Ellipse" };
-	//char morph_str;
 	std::vector<boost::format> entries;
 	for (int i = NUM - 1; i >= 0; i--)
 	{
 		entries.push_back(boost::format("Cam #%i FPS:%i Num of tip:%i") % i % rsu[i].fps % (int)(rsu[i].tip_point_cloud_ptr->size()));
 	}
-
-
-	/*entries.push_back(boost::format("Hand Point Cloud Num = %i") % pointCloudNum[CLOUD_HAND]);
-	entries.push_back(boost::format("Camera Point Cloud Num = %i") % pointCloudNum[CLOUD_CAMERA]);
-	entries.push_back(boost::format("Joint Point Cloud Num = %i") % pointCloudNum[CLOUD_JOINT]);
-	entries.push_back(boost::format("morph_size = %i") % morph_size);
-	entries.push_back(boost::format("morph_elem = %s") % elemStr[morph_elem]);
-	entries.push_back(boost::format("sigmaG = %.1f") % sigmaG);
-	entries.push_back(boost::format("gSize = %i") % gSize);*/
-	//"Element:\n 0: Rect - 1: Cross - 2: Ellipse"
 
 	const int dx = 5;
 	const int dy = 14;
@@ -311,8 +298,6 @@ std::string RealSenseProcessor::makeNameFail(int hrgn, int num)
 // 文字出力
 void RealSenseProcessor::printText(int hrgn, int num)
 {
-	//system("cls");
-
 	cout << "ファイルについて" << endl;
 	cout << "文字：" + makeNameFolder(hrgn) << "(" << hrgn << ")" << "  ";
 	cout << "番号：" << num << "  ";
