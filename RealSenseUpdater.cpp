@@ -3,8 +3,8 @@
 RealSenseUpdater::RealSenseUpdater() :
 	hand_point_cloud_ptr(new pcl::PointCloud<pcl::PointXYZRGB>),
 	camera_point_cloud_ptr(new pcl::PointCloud<pcl::PointXYZRGB>),
-	hand_joint_cloud_ptr(new pcl::PointCloud<pcl::PointXYZRGB>),
-	near_point_cloud_ptr(new pcl::PointCloud<pcl::PointXYZRGB>),
+	//hand_joint_cloud_ptr(new pcl::PointCloud<pcl::PointXYZRGB>),
+	//near_point_cloud_ptr(new pcl::PointCloud<pcl::PointXYZRGB>),
 	tip_point_cloud_ptr(new pcl::PointCloud<pcl::PointXYZRGB>)//PCLŠÖ˜A‚Ì•Ï”‚Ì‰Šú‰»
 {
 
@@ -132,7 +132,15 @@ int RealSenseUpdater::run(void)
 			errorFlag = true;
 
 		if (errorFlag)
-			return RSU_COLOR_IMAGE_UNAVAILABLE;
+		{
+			wColorIO(wColorIO::PRINT_INFO, L"RSU#%d>", cameraNum);
+			wColorIO(wColorIO::PRINT_ERROR, L"colorImage is unavailable at ");
+			wColorIO(wColorIO::PRINT_VALUE, L"%d", frameNum);
+			wColorIO(wColorIO::PRINT_INFO, L"[fr]\n");
+			if (sts != Status::PXC_STATUS_NO_ERROR)
+				showStatus(sts);
+			//return RSU_COLOR_IMAGE_UNAVAILABLE;
+		}
 		else
 			errorFlag = false;
 
@@ -144,19 +152,25 @@ int RealSenseUpdater::run(void)
 				wColorIO(wColorIO::PRINT_INFO, L"RSU#%d>", cameraNum);
 				wColorIO(wColorIO::PRINT_SUCCESS, L"depthImage catched\n");
 #endif
-			}
+		}
 			else
 				errorFlag = true;
-
-		}
+	}
 		else
 			errorFlag = true;
 
 		if (errorFlag)
-			return RSU_COLOR_IMAGE_UNAVAILABLE;
+		{
+			wColorIO(wColorIO::PRINT_INFO, L"RSU#%d>", cameraNum);
+			wColorIO(wColorIO::PRINT_ERROR, L"depthImage is unavailable at ");
+			wColorIO(wColorIO::PRINT_VALUE, L"%d", frameNum);
+			wColorIO(wColorIO::PRINT_INFO, L"[fr]\n");
+			if (sts != Status::PXC_STATUS_NO_ERROR)
+				showStatus(sts);
+			//return RSU_DEPTH_IMAGE_UNAVAILABLE;
+		}
 		else
 			errorFlag = false;
-
 
 		/*if (sample->color && !acqireImage(sample->color, colorImage, PXCImage::PIXEL_FORMAT_RGB32))//updateCameraImage(sample->color, false)
 		{
@@ -270,6 +284,7 @@ int RealSenseUpdater::run(void)
 	//	}
 	isExit = true;
 
+	frameNum++;
 	return isMappingSucceed ? RSU_NO_ERROR : RSU_MAPPING_UNAVAILABLE;
 	//}
 
@@ -664,8 +679,8 @@ bool RealSenseUpdater::saveData(std::string directory, std::string name)
 	if (camera_point_cloud_ptr->size() != 0)
 		pcl::io::savePCDFileBinary(directory + "-PCLCamera" + name + ".pcd", *camera_point_cloud_ptr);
 	//if (isCloudArrived[CLOUD_NEAR])
-	if (near_point_cloud_ptr->size() != 0)
-		pcl::io::savePCDFileBinary(directory + "-PCLNear" + name + ".pcd", *near_point_cloud_ptr);
+	/*if (near_point_cloud_ptr->size() != 0)
+		pcl::io::savePCDFileBinary(directory + "-PCLNear" + name + ".pcd", *near_point_cloud_ptr);*/
 	if (tip_point_cloud_ptr->size() != 0)
 		pcl::io::savePCDFileBinary(directory + "-PCLTip" + name + ".pcd", *tip_point_cloud_ptr);
 

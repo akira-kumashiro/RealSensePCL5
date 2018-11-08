@@ -1,8 +1,8 @@
 #include "PCL_Regist.h"
 
 
-PCL_Regist::PCL_Regist(double _transformationEpsilon, double _maxCorrespondenceDistance, int _maximumIterations, int _loopNum) :
-	param(_transformationEpsilon, _maxCorrespondenceDistance, _maximumIterations, _loopNum),
+PCL_Regist::PCL_Regist(double _transformationEpsilon, double _maxCorrespondenceDistance, int _maximumIterations, int _loopNum, double _leafSize = 0.0) :
+	param(_transformationEpsilon, _maxCorrespondenceDistance, _maximumIterations, _loopNum, _leafSize),
 	transformMat(Eigen::Matrix4f::Identity())
 {
 
@@ -61,6 +61,91 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr PCL_Regist::transformPointcloud(pcl::Poin
 	return output;
 }
 
+double PCL_Regist::singlePairAlign(const PointCloud::Ptr cloud_src, const PointCloud::Ptr cloud_tgt, Eigen::Matrix4f mat)
+{
+	PointCloud::Ptr src(new PointCloud);
+	PointCloud::Ptr tgt(new PointCloud);
+
+	//auto nowTime = std::chrono::system_clock::now();
+
+	src = cloud_src;
+	tgt = cloud_tgt;
+
+	// Compute surface normals and curvature
+	PointCloudWithNormals::Ptr points_with_normals_src(new PointCloudWithNormals);
+	PointCloudWithNormals::Ptr points_with_normals_tgt(new PointCloudWithNormals);
+
+	pcl::NormalEstimation<PointT, PointNormalT> norm_est;
+	pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>());
+	norm_est.setSearchMethod(tree);
+	norm_est.setKSearch(30);
+
+	norm_est.setInputCloud(src);
+	norm_est.compute(*points_with_normals_src);
+	pcl::copyPointCloud(*src, *points_with_normals_src);
+
+	norm_est.setInputCloud(tgt);
+	norm_est.compute(*points_with_normals_tgt);
+	pcl::copyPointCloud(*tgt, *points_with_normals_tgt);
+
+	//
+	// Instantiate our custom point representation (defined above) ...
+	MyPointRepresentation point_representation;
+	// ... and weight the 'curvature' dimension so that it is balanced against x, y, and z
+	float alpha[4] = { 1.0, 1.0, 1.0, 1.0 };
+	point_representation.setRescaleValues(alpha);
+
+	////
+	//// Align
+	pcl::IterativeClosestPointNonLinear<PointNormalT, PointNormalT> reg;
+	reg.setTransformationEpsilon(param.transformationEpsilon);
+	// Set the maximum distance between two correspondences (src<->tgt) to 10cm
+	// Note: adjust this based on the size of your datasets
+	reg.setMaxCorrespondenceDistance(param.maxCorrespondenceDistance);//ëŒâûÇèúäOÇ∑ÇÈãóó£ÇÃËáíl
+																	  // Set the point representation
+	reg.setPointRepresentation(boost::make_shared<const MyPointRepresentation>(point_representation));
+
+	reg.setInputSource(points_with_normals_src);
+	reg.setInputTarget(points_with_normals_tgt);
+
+	////
+	//// Run the same optimization in a loop and visualize the results
+	////Eigen::Matrix4f Ti = Eigen::Matrix4f::Identity(), prev, targetToSource;
+	Eigen::Matrix4f Ti = Eigen::Matrix4f::Identity(), prev, targetToSource;
+	PointCloudWithNormals::Ptr reg_result = points_with_normals_src;
+	reg.setMaximumIterations(param.maximumIterations);//ç≈ëÂîΩïúâÒêî
+	//Eigen::Matrix4d transformation_matrix = Eigen::Matrix4d::Identity();
+	//for (int i = 0; i < param.loopNum; ++i)
+	//{
+		//PCL_INFO("Iteration Nr. %d.\n", i);
+
+		// save cloud for visualization purpose
+		//points_with_normals_src = reg_result;
+
+		// Estimate
+	reg.setInputSource(points_with_normals_src);
+	reg.align(*reg_result);
+
+	//accumulate transformation between each Iteration
+	//Ti = reg.getFinalTransformation() * Ti;
+
+	//if the difference between this transformation and the previous one
+	//is smaller than the threshold, refine the process by reducing
+	//the maximal correspondence distance
+	//if (fabs((reg.getLastIncrementalTransformation() - prev).sum()) < reg.getTransformationEpsilon())
+	//	reg.setMaxCorrespondenceDistance(reg.getMaxCorrespondenceDistance() - random(0.0, param.transformationEpsilon / param.loopNum));
+	//else
+	//	reg.setMaxCorrespondenceDistance(param.maxCorrespondenceDistance);
+	//prev = reg.getLastIncrementalTransformation();
+
+	// visualize current state
+	//showCloudsRight(points_with_normals_tgt, points_with_normals_src);
+
+	//print4x4matrix(Ti);
+//}
+	return fabs((reg.getLastIncrementalTransformation() - prev).sum());
+}
+
 //(PCL_ResistParameters::VoxelGlid(0.0005), 1e-2, 0.2, 1000, 100);
 
 void PCL_Regist::print4x4Matrix(const Eigen::Matrix4f & matrix)
@@ -107,11 +192,26 @@ void PCL_Regist::pairAlign(const PointCloud::Ptr cloud_src, const PointCloud::Pt
 {
 	PointCloud::Ptr src(new PointCloud);
 	PointCloud::Ptr tgt(new PointCloud);
+	pcl::VoxelGrid<PointT> grid;
 
 	auto nowTime = std::chrono::system_clock::now();
 
-	src = cloud_src;
-	tgt = cloud_tgt;
+	if (param.leafSize > 0.0)
+	{
+		grid.setLeafSize(param.leafSize, param.leafSize, param.leafSize);
+		grid.setInputCloud(cloud_src);
+		grid.filter(*src);
+
+		grid.setInputCloud(cloud_tgt);
+		grid.filter(*tgt);
+
+		PCL_INFO("src_cloud(%d->%d),tgt_cloud(%d->%d)\n", cloud_src->size(), src->size(), cloud_tgt->size(), tgt->size());
+	}
+	else
+	{
+		src = cloud_src;
+		tgt = cloud_tgt;
+	}
 
 	// Compute surface normals and curvature
 	PointCloudWithNormals::Ptr points_with_normals_src(new PointCloudWithNormals);
@@ -175,7 +275,7 @@ void PCL_Regist::pairAlign(const PointCloud::Ptr cloud_src, const PointCloud::Pt
 		//is smaller than the threshold, refine the process by reducing
 		//the maximal correspondence distance
 		if (fabs((reg.getLastIncrementalTransformation() - prev).sum()) < reg.getTransformationEpsilon())
-			reg.setMaxCorrespondenceDistance(reg.getMaxCorrespondenceDistance() - random(0.0, 0.001));
+			reg.setMaxCorrespondenceDistance(reg.getMaxCorrespondenceDistance() - random(0.0, param.transformationEpsilon / param.loopNum));
 		else
 			reg.setMaxCorrespondenceDistance(param.maxCorrespondenceDistance);
 		prev = reg.getLastIncrementalTransformation();

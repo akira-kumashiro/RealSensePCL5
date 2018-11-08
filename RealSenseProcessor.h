@@ -60,7 +60,7 @@ private:
 	bool keyboardCallBackSettings(int key);
 	void initializeViewer(const std::string &id, pcl::PointCloud<pcl::PointXYZRGB>::Ptr &pointCloudPtr, double pointSize);
 	bool setReInit(void);
-
+	Eigen::Matrix4f getPresetTransMat(float radius, float theta);
 
 	bool isContinue;
 	bool isUserInterrupt;

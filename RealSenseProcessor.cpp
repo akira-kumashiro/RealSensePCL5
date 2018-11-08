@@ -3,8 +3,8 @@
 RealSenseProcessor::RealSenseProcessor() :
 	viewer(new pcl::visualization::PCLVisualizer("3D Viewer")),
 	rsu(std::vector<RealSenseUpdater>(NUM)),
-	regist_near(std::vector<PCL_Regist>(NUM, PCL_Regist(1e-2, 0.02, 1000, 2))),
-	regist_tip(std::vector<PCL_Regist>(NUM, PCL_Regist(1e-2, 0.2, 1000, 100))),
+	regist_near(std::vector<PCL_Regist>(NUM, PCL_Regist(1e-2, 0.01, 1000, 5, 1.0e-3))),
+	regist_tip(std::vector<PCL_Regist>(NUM, PCL_Regist(1e-2, 0.2, 1000, 100, 0.0))),
 	transformMat(std::vector<Eigen::Matrix4f>(NUM, Eigen::Matrix4f::Identity()))
 {
 	wColorIO(wColorIO::PRINT_INFO, L"RSP>");
@@ -37,7 +37,6 @@ RealSenseProcessor::RealSenseProcessor() :
 
 RealSenseProcessor::~RealSenseProcessor()
 {
-
 	viewer->close();
 
 	cv::destroyAllWindows();
@@ -125,12 +124,12 @@ bool RealSenseProcessor::keyboardCallBackSettings(int key)
 		CreateDirectory((dataFolderName + "\\" + _time).c_str(), NULL); // 大本のフォルダ作成（名前が時間）
 		CreateDirectory((dataFolderName + "\\" + _time + "\\" + makeNameFolder(hrgn) + "-Color").c_str(), NULL); // color画像フォルダ作成
 		CreateDirectory((dataFolderName + "\\" + _time + "\\" + makeNameFolder(hrgn) + "-Depth").c_str(), NULL); // depth画像フォルダ作成
-		CreateDirectory((dataFolderName + "\\" + _time + "\\" + makeNameFolder(hrgn) + "-HandImage").c_str(), NULL); // HandImage画像フォルダ作成
-		CreateDirectory((dataFolderName + "\\" + _time + "\\" + makeNameFolder(hrgn) + "-HandPoint").c_str(), NULL); // HandPoint画像フォルダ作成
+		//CreateDirectory((dataFolderName + "\\" + _time + "\\" + makeNameFolder(hrgn) + "-HandImage").c_str(), NULL); // HandImage画像フォルダ作成
+		//CreateDirectory((dataFolderName + "\\" + _time + "\\" + makeNameFolder(hrgn) + "-HandPoint").c_str(), NULL); // HandPoint画像フォルダ作成
 		CreateDirectory((dataFolderName + "\\" + _time + "\\" + makeNameFolder(hrgn) + "-PCLHand").c_str(), NULL); // PCLHand画像フォルダ作成
-		CreateDirectory((dataFolderName + "\\" + _time + "\\" + makeNameFolder(hrgn) + "-PCLJoint").c_str(), NULL); // PCLJoint画像フォルダ作成
+		//CreateDirectory((dataFolderName + "\\" + _time + "\\" + makeNameFolder(hrgn) + "-PCLJoint").c_str(), NULL); // PCLJoint画像フォルダ作成
 		CreateDirectory((dataFolderName + "\\" + _time + "\\" + makeNameFolder(hrgn) + "-PCLCamera").c_str(), NULL); // PCLCamera画像フォルダ作成
-		CreateDirectory((dataFolderName + "\\" + _time + "\\" + makeNameFolder(hrgn) + "-PCLNear").c_str(), NULL); // PCLNear画像フォルダ作成
+		//CreateDirectory((dataFolderName + "\\" + _time + "\\" + makeNameFolder(hrgn) + "-PCLNear").c_str(), NULL); // PCLNear画像フォルダ作成
 		CreateDirectory((dataFolderName + "\\" + _time + "\\" + makeNameFolder(hrgn) + "-Depth見る用").c_str(), NULL); // depth見る用画像フォルダ作成
 		CreateDirectory((dataFolderName + "\\" + _time + "\\" + makeNameFolder(hrgn) + "-PCLTip").c_str(), NULL); // depth見る用画像フォルダ作成
 		for (int i = 0; i < NUM; i++)
@@ -229,6 +228,15 @@ bool RealSenseProcessor::setReInit(void)
 			return true;
 		}
 	}
+}
+
+Eigen::Matrix4f RealSenseProcessor::getPresetTransMat(float radius, float theta)
+//radius[mm]
+//theta[deg]
+{
+	Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();//(double)std::cos(theta*2*std::_Pi/360.0),0, (double)std::cos(theta * 2 * std::_Pi / 360.0),
+
+	return mat;
 }
 
 void RealSenseProcessor::updateViewerText(void)

@@ -52,13 +52,13 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-#define SHOW_DEPTH_ROW 7
-#define AVERAGE_FRAME_NUM 10
+//#define SHOW_DEPTH_ROW 7
+//#define AVERAGE_FRAME_NUM 10
 #define CLOUD_SCALE 1000
-#define CLOUD_PITCH 1
-#define DIFF_EXCLUDE_THRESHOLD 20
-#define GAUSS_EXCLUDE_THRESHOLD 10
-#define CONTOUR_SIZE_THRESHOLD 10
+//#define CLOUD_PITCH 1
+//#define DIFF_EXCLUDE_THRESHOLD 20
+//#define GAUSS_EXCLUDE_THRESHOLD 10
+//#define CONTOUR_SIZE_THRESHOLD 10
 //#define __DEBUG_MODE__
 
 using namespace Intel::RealSense;
@@ -68,8 +68,8 @@ class RealSenseUpdater
 public:
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr hand_point_cloud_ptr;
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr camera_point_cloud_ptr;
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr hand_joint_cloud_ptr;
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr near_point_cloud_ptr;
+	//pcl::PointCloud<pcl::PointXYZRGB>::Ptr hand_joint_cloud_ptr;
+	//pcl::PointCloud<pcl::PointXYZRGB>::Ptr near_point_cloud_ptr;
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr tip_point_cloud_ptr;
 
 	RealSenseUpdater();
@@ -119,6 +119,8 @@ private:
 	int cameraNum;
 	double nearThreshold = 0.15;
 	double farThreshold = 0.6;
+
+	int frameNum = 0;
 
 	SenseManager *pp;
 
