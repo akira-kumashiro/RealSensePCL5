@@ -100,7 +100,7 @@ private:
 	boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer;
 
 	void ppInit(int num);
-	void showStatus(Status sts);
+	inline void showStatus(Status sts);
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr updatePointCloud(bool isHandDataArrived);
 	bool acqireImage(PXCImage* cameraFrame, cv::Mat &mat, PXCImage::PixelFormat pixelFormat);
 	/*int countMat(cv::Mat mat, cv::Vec4b elm);

@@ -937,7 +937,7 @@ cv::Mat RealSenseUpdater::readDepth(const std::string name)
 	return img.clone();
 }
 
-void RealSenseUpdater::showStatus(Status sts)
+inline void RealSenseUpdater::showStatus(Status sts)
 {
 	wColorIO(wColorIO::PRINT_INFO, L"RSU#%d>", cameraNum);
 	switch (sts)

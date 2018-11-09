@@ -58,7 +58,7 @@ private:
 	void updateViewerText(void);
 	void keyboardCallback(const pcl::visualization::KeyboardEvent& event, void*);
 	bool keyboardCallBackSettings(int key);
-	void initializeViewer(const std::string &id, pcl::PointCloud<pcl::PointXYZRGB>::Ptr &pointCloudPtr, double pointSize);
+	inline void initializeViewer(const std::string &id, pcl::PointCloud<pcl::PointXYZRGB>::Ptr &pointCloudPtr, double pointSize);
 	bool setReInit(void);
 	Eigen::Matrix4f getPresetTransMat(float radius, float theta);
 
@@ -80,10 +80,10 @@ private:
 	std::vector<std::string> tip_cloud_id;
 	std::string dataFileName;
 	std::ofstream dataFile;
-	std::string makeNameFolder(int hrgn);
-	std::string makeNameFail(int hrgn, int num);
-	void printText(int hrgn, int num);
-	std::string getTime(void);
+	inline std::string makeNameFolder(int hrgn);
+	inline std::string makeNameFail(int hrgn, int num);
+	inline void printText(int hrgn, int num);
+	inline std::string getTime(void);
 
 	const int numMax = 9; // •Û‘¶‚·‚éˆê•¶š‚Ì”
 

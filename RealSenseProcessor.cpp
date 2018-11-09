@@ -205,7 +205,7 @@ bool RealSenseProcessor::keyboardCallBackSettings(int key)
 	return true;
 }
 
-void RealSenseProcessor::initializeViewer(const std::string & id, pcl::PointCloud<pcl::PointXYZRGB>::Ptr & pointCloudPtr, double pointSize)
+inline void RealSenseProcessor::initializeViewer(const std::string & id, pcl::PointCloud<pcl::PointXYZRGB>::Ptr & pointCloudPtr, double pointSize)
 {
 	viewer->addPointCloud(pointCloudPtr, id);
 	viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, pointSize, id);
@@ -287,14 +287,14 @@ void RealSenseProcessor::keyboardCallback(const pcl::visualization::KeyboardEven
 	}
 }
 
-std::string RealSenseProcessor::makeNameFolder(int hrgn)
+inline std::string RealSenseProcessor::makeNameFolder(int hrgn)
 {
 	std::string nameFolder = "ｱ";
 	nameFolder[0] = 'ｱ' + hrgn;
 	return nameFolder;
 }
 
-std::string RealSenseProcessor::makeNameFail(int hrgn, int num)
+inline std::string RealSenseProcessor::makeNameFail(int hrgn, int num)
 {
 	std::string nameFail = "ｱ-00";
 	nameFail[0] = 'ｱ' + hrgn;
@@ -304,7 +304,7 @@ std::string RealSenseProcessor::makeNameFail(int hrgn, int num)
 }
 
 // 文字出力
-void RealSenseProcessor::printText(int hrgn, int num)
+inline void RealSenseProcessor::printText(int hrgn, int num)
 {
 	cout << "ファイルについて" << endl;
 	cout << "文字：" + makeNameFolder(hrgn) << "(" << hrgn << ")" << "  ";
@@ -325,7 +325,7 @@ void RealSenseProcessor::printText(int hrgn, int num)
 
 // http://rinov.sakura.ne.jp/wp/cpp-date
 // 時刻取得
-std::string RealSenseProcessor::getTime(void)
+inline std::string RealSenseProcessor::getTime(void)
 {
 	//現在日時を取得する
 	time_t t = time(nullptr);
