@@ -36,7 +36,7 @@
 #include "RealSenseUpdater.h"
 #include "PCL_Regist.h"
 
-#define NUM 3
+#define NUM 2
 #define POWER 3
 #define TIME_STANDBY 50
 
